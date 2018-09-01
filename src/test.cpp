@@ -51,8 +51,8 @@ int main(int argc, char** argv) {
     // }
 
     // describe keypoints
-    // std::vector<descriptor> des = my_latch->describe(im_gray, keypoints);
-    // std::cout << "Descriptors computed." << std::endl;
+    std::vector<descriptor> des = my_latch->describe(im_gray, keypoints);
+    std::cout << des.size() << " descriptors computed." << std::endl;
 
     drawKeypoints(im_gray, keypoints, im_gray);
 
