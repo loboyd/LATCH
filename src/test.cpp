@@ -37,22 +37,11 @@ int main(int argc, char** argv) {
 
     // detect keypoints
     std::vector<cv::KeyPoint> keypoints = my_latch->detect(im_gray);
-    std::cout << keypoints.size() << " keypoints detected." << std::endl;
-
-    // print rows, cols
-    std::cout << "rows: " << im_gray.rows << ", cols: " << im_gray.cols << std::endl;
-    std::cout << std::endl;
-
-    // print out keypoint coordinates
-    // cv::KeyPoint kp;
-    // for (unsigned int i = 0; i < 10; ++i){
-    //     kp = keypoints.at(i);
-    //     std::cout << kp.pt.x << " " << kp.pt.y << std::endl; 
-    // }
+    std::cout << keypoints.size() << " keypoints detected" << std::endl;
 
     // describe keypoints
     std::vector<descriptor> des = my_latch->describe(im_gray, keypoints);
-    std::cout << des.size() << " descriptors computed." << std::endl;
+    std::cout << des.size() << " descriptors computed" << std::endl;
 
     drawKeypoints(im_gray, keypoints, im_gray);
 
