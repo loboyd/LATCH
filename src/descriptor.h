@@ -14,6 +14,11 @@ public:
     std::vector<unsigned long long int> values;
 public:
     descriptor();
+    
+    /*This function is only used for updating an existing value. It's not
+      very smart right now in that it will cause an error if you aren't
+      careful to call it with a valid position value. A regular v.push_back()
+      call should be used to set values.*/
     void set_value(int position, unsigned long long int value);
 };
 

@@ -4,6 +4,11 @@
 /*Simple, bare-bones implementation of the LATCH descriptor as described in
 https://talhassner.github.io/home/projects/LATCH/LATCH.pdf
 
+Matching is not supported yet, but that should be one of the next things to
+implement. Also, smarter FAST detection would be nice. Maybe this is done
+by using an adaptive threshold or maybe some nicer technique for keeping only
+the ``best`` points.
+
 The patch triple were found here:
 https://github.com/opencv/opencv_contrib/blob/master/modules/xfeatures2d/src/latch.cpp
 
@@ -29,16 +34,14 @@ public:
     LATCH();
     LATCH(int _patch_size, int _window_size);
 
-    /*Detect features using OpenCV built-in FAST detector*/
+    /*Detect features using OpenCV built-in FAST detector. Eventually it
+      would be nice to have the ability to specify the desired number of
+      keypoints returned.*/
     std::vector<cv::KeyPoint>
     detect(cv::Mat& im);
 
-    /*TODO*/
-    /*Compute descriptors for a vector of keypoints
-      Run LATCH::clean_keypoints to make sure all keypoints are
-      within the correct bounds first*/
-    // std::vector<keypoint>
-    // std::vector<unsigned long long int>
+    /*Compute descriptors for a vector of keypoints using custom LATCH
+      implementation.*/
     std::vector<descriptor>
     describe(cv::Mat &im, std::vector<cv::KeyPoint> &keypoints);
 
