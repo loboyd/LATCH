@@ -67,10 +67,10 @@ LATCH::describe(cv::Mat &im, std::vector<cv::KeyPoint> &keypoints)
                 int p = 64*j + k;  // under j and k loops goes from 0 to 511
 
                 // cut out patchs
-                row1 = row - patch_radius + triples.at(p/6 + 0);
-                row2 = row + patch_radius + triples.at(p/6 + 0);
-                col1 = col - patch_radius + triples.at(p/6 + 1);
-                col2 = col + patch_radius + triples.at(p/6 + 1);
+                row1 = row - patch_radius + triples.at(p*6 + 0);
+                row2 = row + patch_radius + triples.at(p*6 + 0);
+                col1 = col - patch_radius + triples.at(p*6 + 1);
+                col2 = col + patch_radius + triples.at(p*6 + 1);
                 cv::Mat anchor = im(cv::Range(row1,row2), cv::Range(col1,col2));
 
                 row1 = row - patch_radius + triples.at(6*p + 2);
