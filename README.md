@@ -9,3 +9,5 @@ The LATCH paper is [here.](https://talhassner.github.io/home/projects/LATCH/LATC
 
 I used the LATCH triple values from the OpenCV implementation [source code.](https://github.com/opencv/opencv_contrib/blob/master/modules/xfeatures2d/src/latch.cpp)
 
+## Dependencies
+OpenCV
