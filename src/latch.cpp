@@ -1,4 +1,3 @@
-#include <cmath>
 #include <iostream>
 #include <iterator>
 
@@ -92,7 +91,7 @@ LATCH::describe(cv::Mat &im, std::vector<cv::KeyPoint> &keypoints)
     return descriptors;
 }
 
-double LATCH::frobenius_norm(cv::Mat& patch)
+double LATCH::frobenius_norm_squared(cv::Mat& patch)
 {
     int n_rows = patch.rows;
     int n_cols = patch.cols;
@@ -106,7 +105,7 @@ double LATCH::frobenius_norm(cv::Mat& patch)
         }
     }
 
-    return sqrt(total);
+    return total;
 }
 
 bool LATCH::compare_patches(cv::Mat& anchor, cv::Mat& p1, cv::Mat& p2)
@@ -114,14 +113,10 @@ bool LATCH::compare_patches(cv::Mat& anchor, cv::Mat& p1, cv::Mat& p2)
     cv::Mat p1_diff = anchor - p1;
     cv::Mat p2_diff = anchor - p2;
 
-    double fn_diff1 = frobenius_norm(p1_diff);
-    double fn_diff2 = frobenius_norm(p2_diff);
+    double fn_diff1 = frobenius_norm_squared(p1_diff);
+    double fn_diff2 = frobenius_norm_squared(p2_diff);
 
-    if (fn_diff1 > fn_diff2) {
-        return 1;
-    } else {
-        return 0;
-    }
+    return (fn_diff2 < fn_diff1);
 }
 
 std::vector<int> LATCH::triples = 

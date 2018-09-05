@@ -45,8 +45,8 @@ public:
     std::vector<Descriptor512>
     describe(cv::Mat &im, std::vector<cv::KeyPoint> &keypoints);
 
-    /*Compute the Frobenius norm on a grayscale image patch*/
-    double frobenius_norm(cv::Mat& patch);
+    /*Compute the square of the Frobenius norm on a grayscale image patch*/
+    double frobenius_norm_squared(cv::Mat& patch);
 
     /*Compute LATCH boolean value for a single patch triple*/
     bool compare_patches(cv::Mat& p1, cv::Mat& p2, cv::Mat& anchor);
