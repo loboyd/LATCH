@@ -47,9 +47,10 @@ std::vector<Descriptor512>
 LATCH::describe(cv::Mat &im, std::vector<cv::KeyPoint> &keypoints)
 {
     int row, col;
-    int row1, row2, col1, col2;      // patch boundaries
-    unsigned long long int des_tmp;  // temp variable for chunk descriptor
-    Descriptor512 des;               // single full descriptor
+    int row1, row2, col1, col2;  // patch boundaries
+    // unsigned long long int des_tmp;  // temp variable for chunk descriptor
+    uint64_t des_tmp;            // temp variable for chunk descriptor
+    Descriptor512 des;           // single full descriptor
     std::vector<Descriptor512> descriptors;
 
     // loop over KeyPoints and build sum

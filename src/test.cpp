@@ -46,10 +46,10 @@ int main(int argc, char** argv) {
     drawKeypoints(im_gray, keypoints, im_gray);
 
     // display image
-    cv::namedWindow("Display window", cv::WINDOW_AUTOSIZE);
-    cv::imshow("Display window", im_gray);
+    // cv::namedWindow("Display window", cv::WINDOW_AUTOSIZE);
+    // cv::imshow("Display window", im_gray);
 
-    cv::waitKey(0);
+    // cv::waitKey(0);
 
     std::cout << "All done." << std::endl;
 

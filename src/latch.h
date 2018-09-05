@@ -15,6 +15,7 @@ https://github.com/opencv/opencv_contrib/blob/master/modules/xfeatures2d/src/lat
 2018.08.27  --  L. Boyd*/
 
 #include <vector>
+#include <cstdint>
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
