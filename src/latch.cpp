@@ -3,7 +3,6 @@
 #include <iterator>
 
 #include "latch.h"
-#include "descriptor.h"
 
 LATCH::LATCH()
 {
@@ -45,16 +44,14 @@ LATCH::detect(cv::Mat& im)
     return keypoints;
 }
 
-// std::vector<unsigned long long int>
-// std::vector<keypoint>
-std::vector<descriptor>
+std::vector<Descriptor512>
 LATCH::describe(cv::Mat &im, std::vector<cv::KeyPoint> &keypoints)
 {
     int row, col;
     int row1, row2, col1, col2;      // patch boundaries
     unsigned long long int des_tmp;  // temp variable for chunk descriptor
-    descriptor des;                  // single full descriptor
-    std::vector<descriptor> descriptors;
+    Descriptor512 des;               // single full descriptor
+    std::vector<Descriptor512> descriptors;
 
     // loop over KeyPoints and build sum
     for (unsigned int i = 0; i < keypoints.size(); ++i) {
@@ -86,9 +83,9 @@ LATCH::describe(cv::Mat &im, std::vector<cv::KeyPoint> &keypoints)
                 cv::Mat patch2 = im(cv::Range(row1,row2), cv::Range(col1,col2));
 
                 // compare patches and add bit
-                des_tmp += pow(2,k)*compare_patches(anchor, patch1, patch2);
+                des_tmp |= (compare_patches(anchor, patch1, patch2) << k);
             }
-            des.values.push_back(des_tmp);
+            des.word[j] = des_tmp;
         }
         descriptors.push_back(des);
     }

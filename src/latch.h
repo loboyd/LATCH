@@ -42,7 +42,7 @@ public:
 
     /*Compute descriptors for a vector of keypoints using custom LATCH
       implementation.*/
-    std::vector<descriptor>
+    std::vector<Descriptor512>
     describe(cv::Mat &im, std::vector<cv::KeyPoint> &keypoints);
 
     /*Compute the Frobenius norm on a grayscale image patch*/
