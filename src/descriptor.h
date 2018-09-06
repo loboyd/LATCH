@@ -16,6 +16,16 @@ public:
     static constexpr int kBitsPerWord = sizeof(uint64_t) * CHAR_BIT;
     static constexpr int kWords = kBitSize / kBitsPerWord;
     uint64_t word[kWords];
+public:
+    uint64_t HammingDistance(const Descriptor & des)
+    {
+        int pop = 0;
+        for (int i = 0; i < kWords; ++i) {
+            // count the ones in the XOR of the two descriptor strings
+            pop += __builtin_popcount(this->word[i]^des.word[i]);
+        }
+        return pop;
+    }
 };
 typedef Descriptor<512> Descriptor512;
 
