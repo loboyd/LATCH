@@ -1,5 +1,6 @@
 #include <iostream>
 #include <iterator>
+#include <cmath>
 
 #include "latch.h"
 
@@ -18,7 +19,7 @@ LATCH::LATCH(int _patch_radius, int _window_radius)
 // static stuff
 // temporary threshold set to limit keypoints
 cv::Ptr<cv::FastFeatureDetector> LATCH::detector
-    = cv::FastFeatureDetector::create(45);
+    = cv::FastFeatureDetector::create(100); //45);
 
 std::vector<cv::KeyPoint>
 LATCH::detect(cv::Mat& im)
@@ -48,10 +49,10 @@ LATCH::describe(cv::Mat &im, std::vector<cv::KeyPoint> &keypoints)
 {
     int row, col;
     int row1, row2, col1, col2;  // patch boundaries
-    // unsigned long long int des_tmp;  // temp variable for chunk descriptor
     uint64_t des_tmp;            // temp variable for chunk descriptor
     Descriptor512 des;           // single full descriptor
     std::vector<Descriptor512> descriptors;
+    uint64_t compare_bit;        // necessary to bitshift bool to >32 bits
 
     // loop over KeyPoints and build sum
     for (unsigned int i = 0; i < keypoints.size(); ++i) {
@@ -60,14 +61,16 @@ LATCH::describe(cv::Mat &im, std::vector<cv::KeyPoint> &keypoints)
 
         // store 8 64-bit ints for a total of 512 bits
         for (int j = 0; j < 8; ++j) {
+            des_tmp = 0;
+            // loop over bits in a single descriptor word
             for (int k = 0; k < 64; ++k) {
                 int p = 64*j + k;  // under j and k loops goes from 0 to 511
 
                 // cut out patchs
-                row1 = row - patch_radius + triples.at(p*6 + 0);
-                row2 = row + patch_radius + triples.at(p*6 + 0);
-                col1 = col - patch_radius + triples.at(p*6 + 1);
-                col2 = col + patch_radius + triples.at(p*6 + 1);
+                row1 = row - patch_radius + triples.at(6*p + 0);
+                row2 = row + patch_radius + triples.at(6*p + 0);
+                col1 = col - patch_radius + triples.at(6*p + 1);
+                col2 = col + patch_radius + triples.at(6*p + 1);
                 cv::Mat anchor = im(cv::Range(row1,row2), cv::Range(col1,col2));
 
                 row1 = row - patch_radius + triples.at(6*p + 2);
@@ -83,7 +86,8 @@ LATCH::describe(cv::Mat &im, std::vector<cv::KeyPoint> &keypoints)
                 cv::Mat patch2 = im(cv::Range(row1,row2), cv::Range(col1,col2));
 
                 // compare patches and add bit
-                des_tmp |= (compare_patches(anchor, patch1, patch2) << k);
+                compare_bit = compare_patches(anchor, patch1, patch2);
+                des_tmp |= (compare_bit << k);
             }
             des.word[j] = des_tmp;
         }
@@ -118,6 +122,49 @@ bool LATCH::compare_patches(cv::Mat& anchor, cv::Mat& p1, cv::Mat& p2)
     double fn_diff2 = frobenius_norm_squared(p2_diff);
 
     return (fn_diff2 < fn_diff1);
+}
+
+std::vector<size_t> LATCH::match_keypoints_one_way(
+    const std::vector<Descriptor512> & des1,
+    const std::vector<Descriptor512> & des2)
+{
+    uint64_t current_min = UINT64_MAX;  // minimum distance seen so far
+    uint64_t distance;                  // distance for current keypoint
+    Descriptor512 current_des;
+    std::vector<size_t> matches(des1.size());
+
+    // perform simple linear search over des2 for each descriptor in des1
+    for (size_t i = 0; i < des1.size(); ++i) {
+        current_des = des1.at(i);
+        for (size_t j = 0; j < des2.size(); ++j) {
+            distance = current_des.HammingDistance(des2.at(j));
+            if (distance < current_min) {
+                current_min = distance;
+                matches.at(i) = j;
+            }
+        }
+        current_min = UINT64_MAX;  // reset distance tracker
+    }
+    return matches;
+}
+
+std::vector< std::pair<size_t, size_t> > LATCH::match_keypoint_pairs(
+    const std::vector<Descriptor512> & des1,
+    const std::vector<Descriptor512> & des2)
+    // const std::vector<size_t> & matches1,
+    // const std::vector<size_t> & matches2)
+{
+    std::vector<size_t> matches1 = match_keypoints_one_way(des1, des2);
+    std::vector<size_t> matches2 = match_keypoints_one_way(des2, des1);
+    int j;
+    std::vector< std::pair<size_t, size_t> > pairs;
+    for (size_t i = 0; i < matches1.size(); ++i) {
+        j = matches1.at(i);
+        if (matches2.at(j) == i) {
+            pairs.emplace_back(i,j);
+        }
+    }
+    return pairs;
 }
 
 std::vector<int> LATCH::triples = 

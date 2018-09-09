@@ -1,58 +1,31 @@
-#include <opencv2/opencv.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/features2d.hpp>
-
 #include <iostream>
 #include <string>
 #include <vector>
 
+#include <opencv2/opencv.hpp>
+
 #include "latch.h"
 
-int main(int argc, char** argv) {
-    // get an image file
-    std::string imfile("../images/right.jpg");
-    if (argc > 2) {
-        std::cout << "Usage: main <image_path>" << std::endl;
-        return -1;
-    } else if (argc > 1) {
-        imfile = argv[1];
-    }
+/*This file will ultimately contain some testing code.*/
 
-    // read in image
-    cv::Mat im, im_gray;
-    im = cv::imread(imfile, cv::IMREAD_COLOR);
-    if (im.empty()) {
-        std::cout << "Could not open or find the image" << std::endl;
+int main()
+{
+    // read in images
+    std::string imfile1("../images/right.jpg");
+    std::string imfile2("../images/left.jpg");
+    cv::Mat im1 = cv::imread(imfile1, cv::IMREAD_COLOR);
+    cv::Mat im2 = cv::imread(imfile2, cv::IMREAD_COLOR);
+
+    // check images actually have data
+    if (right.empty() || left.empty()) {
+        std::cout << "Could not open or find images" << std::endl;
         return -1;
     } else {
         // convert to grayscale
-        cv::cvtColor(im, im_gray, cv::COLOR_BGR2GRAY);
+        cv::cvtColor(im1, im1, cv::COLOR_BGR2GRAY);
+        cv::cvtColor(im2, im2, cv::COLOR_BGR2GRAY);
     }
 
-    // create LATCH
-    LATCH* my_latch = new LATCH();
-    std::cout << "LATCH created" << std::endl;
-
-    // detect keypoints
-    std::vector<cv::KeyPoint> keypoints = my_latch->detect(im_gray);
-    std::cout << keypoints.size() << " keypoints detected" << std::endl;
-
-    // describe keypoints
-    std::vector<Descriptor512> des = my_latch->describe(im_gray, keypoints);
-    std::cout << des.size() << " descriptors computed" << std::endl;
-
-    drawKeypoints(im_gray, keypoints, im_gray);
-
-    // display image
-    // cv::namedWindow("Display window", cv::WINDOW_AUTOSIZE);
-    // cv::imshow("Display window", im_gray);
-
-    // cv::waitKey(0);
-
     std::cout << "All done." << std::endl;
-
     return 0;
 }
-

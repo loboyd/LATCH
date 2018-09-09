@@ -51,6 +51,20 @@ public:
 
     /*Compute LATCH boolean value for a single patch triple*/
     bool compare_patches(cv::Mat& p1, cv::Mat& p2, cv::Mat& anchor);
+
+    /*Find best matches from second vector of keypoints for each keypoint in
+      first vector*/
+    std::vector<size_t> match_keypoints_one_way(
+        const std::vector<Descriptor512> & des1,
+        const std::vector<Descriptor512> & des2);
+
+    /*Returns indices for pairs of descriptors whose closest match is
+      each other*/
+    std::vector< std::pair<size_t, size_t> > match_keypoint_pairs(
+        const std::vector<Descriptor512> & des1,
+        const std::vector<Descriptor512> & des2);
+        // const std::vector<size_t> & matches1,
+        // const std::vector<size_t> & matches2);
 };
 
 #endif // LATCH_H
