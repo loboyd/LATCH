@@ -69,10 +69,10 @@ int main(int argc, char** argv) {
     }
 
     // display image
-    cv::namedWindow("Display window", cv::WINDOW_AUTOSIZE);
-    cv::imshow("Display window", matches);
+    // cv::namedWindow("Display window", cv::WINDOW_AUTOSIZE);
+    // cv::imshow("Display window", matches);
 
-    cv::waitKey(0);
+    // cv::waitKey(0);
 
     std::cout << "All done." << std::endl;
 
