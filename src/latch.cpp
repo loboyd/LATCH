@@ -19,7 +19,8 @@ LATCH::LATCH(int _patch_radius, int _window_radius)
 // static stuff
 // temporary threshold set to limit keypoints
 cv::Ptr<cv::FastFeatureDetector> LATCH::detector
-    = cv::FastFeatureDetector::create(100); //45);
+    // = cv::FastFeatureDetector::create(100); //45);
+    = cv::FastFeatureDetector::create(45);
 
 std::vector<cv::KeyPoint>
 LATCH::detect(cv::Mat& im)
@@ -100,12 +101,13 @@ double LATCH::frobenius_norm_squared(cv::Mat& patch)
 {
     int n_rows = patch.rows;
     int n_cols = patch.cols;
+    cv::Scalar pixel;
 
     // sum squares of elements
     double total = 0;
     for (int i = 0; i < n_rows; ++i) {
         for (int j = 0; j < n_cols; ++j) {
-            cv::Scalar pixel = patch.at<uchar>(i,j);
+            pixel = patch.at<uchar>(i,j);
             total += pixel.val[0]*pixel.val[0];
         }
     }
