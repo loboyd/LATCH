@@ -54,7 +54,6 @@ LATCH::describe(cv::Mat &im, std::vector<cv::KeyPoint> &keypoints)
     Descriptor512 des;           // single full descriptor
     std::vector<Descriptor512> descriptors;
     uint64_t compare_bit;        // necessary to bitshift bool to >32 bits
-    cv::Mat patch1, patch2, anchor;
 
     // loop over KeyPoints and build sum
     for (unsigned int i = 0; i < keypoints.size(); ++i) {
@@ -73,19 +72,19 @@ LATCH::describe(cv::Mat &im, std::vector<cv::KeyPoint> &keypoints)
                 row2 = row + patch_radius + triples.at(6*p + 0);
                 col1 = col - patch_radius + triples.at(6*p + 1);
                 col2 = col + patch_radius + triples.at(6*p + 1);
-                anchor = im(cv::Range(row1,row2), cv::Range(col1,col2));
+                cv::Mat anchor = im(cv::Range(row1,row2), cv::Range(col1,col2));
 
                 row1 = row - patch_radius + triples.at(6*p + 2);
                 row2 = row + patch_radius + triples.at(6*p + 2);
                 col1 = col - patch_radius + triples.at(6*p + 3);
                 col2 = col + patch_radius + triples.at(6*p + 3);
-                patch1 = im(cv::Range(row1,row2), cv::Range(col1,col2));
+                cv::Mat patch1 = im(cv::Range(row1,row2), cv::Range(col1,col2));
 
                 row1 = row - patch_radius + triples.at(6*p + 4);
                 row2 = row + patch_radius + triples.at(6*p + 4);
                 col1 = col - patch_radius + triples.at(6*p + 5);
                 col2 = col + patch_radius + triples.at(6*p + 5);
-                patch2 = im(cv::Range(row1,row2), cv::Range(col1,col2));
+                cv::Mat patch2 = im(cv::Range(row1,row2), cv::Range(col1,col2));
 
                 // compare patches and add bit
                 compare_bit = compare_patches(anchor, patch1, patch2);
