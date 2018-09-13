@@ -1,3 +1,4 @@
-example
-test.cpp
-analysis*
+src/example
+src/test.cpp
+src/analysis*
+src/gmon.out
