@@ -1,5 +1,5 @@
 # LATCH
-Implementation of LATCH descriptor (Levi/Hassner)
+Implementation of the LATCH descriptor (Levi/Hassner)
 
 This is my own implementation of the LATCH descriptor by Levi and Hassner written from scratch in C++.
 
