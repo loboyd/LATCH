@@ -1,5 +1,5 @@
 # LATCH
-Implementation of the LATCH feature descriptor (Levi/Hassner)
+Implementation of the LATCH feature descriptor and brute force matcher (Levi/Hassner)
 
 This is my own implementation of the LATCH descriptor by Levi and Hassner written from scratch in C++.
 
