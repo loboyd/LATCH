@@ -1,7 +1,3 @@
-#include <iostream>
-#include <iterator>
-#include <cmath>
-
 #include "latch.h"
 
 LATCH::LATCH()
