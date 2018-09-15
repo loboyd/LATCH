@@ -18,10 +18,10 @@ https://github.com/opencv/opencv_contrib/blob/master/modules/xfeatures2d/src/lat
 #include <cstdint>
 
 #include <opencv2/opencv.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/features2d.hpp>
+// #include <opencv2/core/core.hpp>
+// #include <opencv2/imgcodecs.hpp>
+// #include <opencv2/highgui/highgui.hpp>
+// #include <opencv2/features2d.hpp>
 
 #include "descriptor.h"
 
