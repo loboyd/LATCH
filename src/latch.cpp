@@ -97,14 +97,17 @@ double LATCH::frobenius_norm_squared(cv::Mat& patch)
 {
     int n_rows = patch.rows;
     int n_cols = patch.cols;
-    cv::Scalar pixel;
+    int stride = patch.step;
+    // cv::Scalar pixel;
+    uint8_t *data = patch.data;
 
     // sum squares of elements
     double total = 0;
     for (int i = 0; i < n_rows; ++i) {
         for (int j = 0; j < n_cols; ++j) {
-            pixel = patch.at<uchar>(i,j);
-            total += pixel.val[0]*pixel.val[0];
+            // pixel = patch.at<uchar>(i,j);
+            // total += pixel.val[0]*pixel.val[0];
+            total += data[i*stride + j];
         }
     }
 
