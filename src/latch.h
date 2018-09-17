@@ -18,10 +18,6 @@ https://github.com/opencv/opencv_contrib/blob/master/modules/xfeatures2d/src/lat
 #include <cstdint>
 
 #include <opencv2/opencv.hpp>
-// #include <opencv2/core/core.hpp>
-// #include <opencv2/imgcodecs.hpp>
-// #include <opencv2/highgui/highgui.hpp>
-// #include <opencv2/features2d.hpp>
 
 #include "descriptor.h"
 
@@ -39,30 +35,39 @@ public:
       would be nice to have the ability to specify the desired number of
       keypoints returned.*/
     std::vector<cv::KeyPoint>
-    detect(cv::Mat& im);
+    detect(const cv::Mat & im) const;
 
     /*Compute descriptors for a vector of keypoints using custom LATCH
       implementation.*/
     std::vector<Descriptor512>
-    describe(cv::Mat &im, std::vector<cv::KeyPoint> &keypoints);
+    describe(const cv::Mat & im,
+        const std::vector<cv::KeyPoint> & keypoints) const;
 
-    /*Compute the square of the Frobenius norm on a grayscale image patch*/
-    double frobenius_norm_squared(cv::Mat& patch);
+    /*Compute the square of the Frobenius distance between two grayscale
+      image patches*/
+    double frobenius_distance_squared(const cv::Mat & im,
+        const int & row1,
+        const int & col1,
+        const int & row2,
+        const int & col2) const;
 
     /*Compute LATCH boolean value for a single patch triple*/
-    bool compare_patches(cv::Mat& p1, cv::Mat& p2, cv::Mat& anchor);
+    bool compare_patches(const cv::Mat & im,
+        const int & patch1_row, const int & patch1_col,
+        const int & patch2_row, const int & patch2_col,
+        const int & anchor_row, const int & anchor_col) const;
 
     /*Find best matches from second vector of keypoints for each keypoint in
       first vector*/
     std::vector<size_t> match_keypoints_one_way(
         const std::vector<Descriptor512> & des1,
-        const std::vector<Descriptor512> & des2);
+        const std::vector<Descriptor512> & des2) const;
 
     /*Returns indices for pairs of descriptors whose closest match is
       each other*/
     std::vector< std::pair<size_t, size_t> > match_keypoint_pairs(
         const std::vector<Descriptor512> & des1,
-        const std::vector<Descriptor512> & des2);
+        const std::vector<Descriptor512> & des2) const;
         // const std::vector<size_t> & matches1,
         // const std::vector<size_t> & matches2);
 };

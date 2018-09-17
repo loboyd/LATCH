@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-// #include <ctime>
+#include <ctime>
 // #include <cmath>
 
 #include <opencv2/opencv.hpp>
@@ -38,17 +38,29 @@ int main(int argc, char** argv) {
     // detect keypoints
     std::vector<cv::KeyPoint> rkeypoints = my_latch->detect(rgray);
     std::vector<cv::KeyPoint> lkeypoints = my_latch->detect(lgray);
-    std::cout << "Keypoints detected" << std::endl;
+    std::cout << rkeypoints.size() << " keypoints detected" << std::endl;
 
     // describe keypoints
+    clock_t t1 = clock();
     std::vector<Descriptor512> rdes = my_latch->describe(rgray, rkeypoints);
     std::vector<Descriptor512> ldes = my_latch->describe(lgray, lkeypoints);
-    std::cout << "Descriptors computed" << std::endl;
+    clock_t t2 = clock();
+    std::cout << "Descriptors computed in ";
+    std::cout << (t2-t1)/CLOCKS_PER_SEC << " s." << std::endl;
+
+    // print out descriptor values
+    for (size_t i = 0; i < rdes.size(); ++i) {
+        for (int j = 0; j < 8; ++j) {
+            // std::cout << rdes.at(i).word[j] << std::endl;
+        }
+        // std::cout << "\n\n" << std::endl;
+    }
 
     // match keypoints
     std::vector<std::pair<size_t, size_t>> pairs;
     pairs = my_latch->match_keypoint_pairs(rdes, ldes);
     std::cout << "Keypoints matched" << std::endl;
+    std::cout << pairs.size() << " matches found." << std::endl;
 
     // draw keypoint matches
     cv::Mat matches;
@@ -69,10 +81,10 @@ int main(int argc, char** argv) {
     }
 
     // display image
-    // cv::namedWindow("Display window", cv::WINDOW_AUTOSIZE);
-    // cv::imshow("Display window", matches);
+    cv::namedWindow("Display window", cv::WINDOW_AUTOSIZE);
+    cv::imshow("Display window", matches);
 
-    // cv::waitKey(0);
+    cv::waitKey(0);
 
     std::cout << "All done." << std::endl;
 

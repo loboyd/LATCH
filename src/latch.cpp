@@ -15,11 +15,11 @@ LATCH::LATCH(int _patch_radius, int _window_radius)
 // static stuff
 // temporary threshold set to limit keypoints
 cv::Ptr<cv::FastFeatureDetector> LATCH::detector
-    // = cv::FastFeatureDetector::create(100); //45);
+    // = cv::FastFeatureDetector::create(100);
     = cv::FastFeatureDetector::create(45);
 
 std::vector<cv::KeyPoint>
-LATCH::detect(cv::Mat& im)
+LATCH::detect(const cv::Mat & im) const
 {
     int nrows = im.rows;
     int ncols = im.cols;
@@ -42,10 +42,11 @@ LATCH::detect(cv::Mat& im)
 }
 
 std::vector<Descriptor512>
-LATCH::describe(cv::Mat &im, std::vector<cv::KeyPoint> &keypoints)
+LATCH::describe(const cv::Mat & im,
+    const std::vector<cv::KeyPoint> & keypoints) const
 {
     int row, col;
-    int row1, row2, col1, col2;  // patch boundaries
+    // int row1, row2, col1, col2;  // patch boundaries
     uint64_t des_tmp;            // temp variable for chunk descriptor
     Descriptor512 des;           // single full descriptor
     std::vector<Descriptor512> descriptors;
@@ -63,27 +64,19 @@ LATCH::describe(cv::Mat &im, std::vector<cv::KeyPoint> &keypoints)
             for (int k = 0; k < 64; ++k) {
                 int p = 64*j + k;  // under j and k loops goes from 0 to 511
 
-                // cut out patchs
-                row1 = row - patch_radius + triples.at(6*p + 0);
-                row2 = row + patch_radius + triples.at(6*p + 0);
-                col1 = col - patch_radius + triples.at(6*p + 1);
-                col2 = col + patch_radius + triples.at(6*p + 1);
-                cv::Mat anchor = im(cv::Range(row1,row2), cv::Range(col1,col2));
-
-                row1 = row - patch_radius + triples.at(6*p + 2);
-                row2 = row + patch_radius + triples.at(6*p + 2);
-                col1 = col - patch_radius + triples.at(6*p + 3);
-                col2 = col + patch_radius + triples.at(6*p + 3);
-                cv::Mat patch1 = im(cv::Range(row1,row2), cv::Range(col1,col2));
-
-                row1 = row - patch_radius + triples.at(6*p + 4);
-                row2 = row + patch_radius + triples.at(6*p + 4);
-                col1 = col - patch_radius + triples.at(6*p + 5);
-                col2 = col + patch_radius + triples.at(6*p + 5);
-                cv::Mat patch2 = im(cv::Range(row1,row2), cv::Range(col1,col2));
+                // get patch translations
+                int patch1_row = row + triples.at(6*p + 0);
+                int patch1_col = col + triples.at(6*p + 1);
+                int patch2_row = row + triples.at(6*p + 2);
+                int patch2_col = col + triples.at(6*p + 3);
+                int anchor_row = row + triples.at(6*p + 4);
+                int anchor_col = col + triples.at(6*p + 5);
 
                 // compare patches and add bit
-                compare_bit = compare_patches(anchor, patch1, patch2);
+                compare_bit = compare_patches(im,
+                patch1_row, patch1_col,
+                patch2_row, patch2_col,
+                anchor_row, anchor_col);
                 des_tmp |= (compare_bit << k);
             }
             des.word[j] = des_tmp;
@@ -93,41 +86,49 @@ LATCH::describe(cv::Mat &im, std::vector<cv::KeyPoint> &keypoints)
     return descriptors;
 }
 
-double LATCH::frobenius_norm_squared(cv::Mat& patch)
+double LATCH::frobenius_distance_squared(const cv::Mat & im,
+    const int & row1,
+    const int & col1,
+    const int & row2,
+    const int & col2) const
 {
-    int n_rows = patch.rows;
-    int n_cols = patch.cols;
-    int stride = patch.step;
-    // cv::Scalar pixel;
-    uint8_t *data = patch.data;
+    int stride = im.step;
+    uint8_t *data = im.data;  // get underlying cv::Mat data for speed
 
-    // sum squares of elements
+    // iterate over both image patches in the same loop
+    // add up the squares of the pixel differences
     double total = 0;
-    for (int i = 0; i < n_rows; ++i) {
-        for (int j = 0; j < n_cols; ++j) {
-            // pixel = patch.at<uchar>(i,j);
-            // total += pixel.val[0]*pixel.val[0];
-            total += data[i*stride + j];
+    for (int i = -patch_radius; i <= patch_radius; ++i) {
+        for (int j = -patch_radius; j <= patch_radius; ++j) {
+            // get translated indices into image data
+            int ind1 = (row1+i)*stride + (col1+j);
+            int ind2 = (row2+i)*stride + (col2+j);
+            uint8_t val1 = data[ind1];
+            uint8_t val2 = data[ind2];
+            total += (val1-val2) * (val1-val2);
         }
     }
 
     return total;
 }
 
-bool LATCH::compare_patches(cv::Mat& anchor, cv::Mat& p1, cv::Mat& p2)
+bool LATCH::compare_patches(const cv::Mat & im,
+    const int & patch1_row, const int & patch1_col,
+    const int & patch2_row, const int & patch2_col,
+    const int & anchor_row, const int & anchor_col) const
 {
-    cv::Mat p1_diff = anchor - p1;
-    cv::Mat p2_diff = anchor - p2;
+    double dist1 = frobenius_distance_squared(im, patch1_row,
+        patch1_col, anchor_row, anchor_col);
 
-    double fn_diff1 = frobenius_norm_squared(p1_diff);
-    double fn_diff2 = frobenius_norm_squared(p2_diff);
+    double dist2 = frobenius_distance_squared(im, patch2_row,
+        patch2_col, anchor_row, anchor_col);
 
-    return (fn_diff2 < fn_diff1);
+    return (dist2 < dist1);
 }
 
 std::vector<size_t> LATCH::match_keypoints_one_way(
     const std::vector<Descriptor512> & des1,
-    const std::vector<Descriptor512> & des2)
+    const std::vector<Descriptor512> & des2) const
 {
     uint64_t current_min = UINT64_MAX;  // minimum distance seen so far
     uint64_t distance;                  // distance for current keypoint
@@ -151,7 +152,7 @@ std::vector<size_t> LATCH::match_keypoints_one_way(
 
 std::vector< std::pair<size_t, size_t> > LATCH::match_keypoint_pairs(
     const std::vector<Descriptor512> & des1,
-    const std::vector<Descriptor512> & des2)
+    const std::vector<Descriptor512> & des2) const
     // const std::vector<size_t> & matches1,
     // const std::vector<size_t> & matches2)
 {
