@@ -15,13 +15,6 @@ LATCH::LATCH(int _patch_radius, int _window_radius)
     detector = cv::FastFeatureDetector::create(100);
 }
 
-// static stuff
-// temporary threshold set to limit keypoints
-// cv::Ptr<cv::FastFeatureDetector> LATCH::detector
-    // = cv::FastFeatureDetector::create(100);
-    // = cv::FastFeatureDetector::create(45);
-    // = cv::FastFeatureDetector::create(100);
-
 std::vector<cv::KeyPoint>
 LATCH::detect(const cv::Mat & im) const
 {
