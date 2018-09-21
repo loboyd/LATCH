@@ -16,6 +16,8 @@ int main(int argc, char** argv) {
     // get image files
     std::string right_imfile("../images/right.jpg");
     std::string  left_imfile("../images/left.jpg");
+    // std::string right_imfile("../images/far.jpg");
+    // std::string  left_imfile("../images/close.jpg");
 
     // read in images
     cv::Mat right, left, rgray, lgray;
@@ -48,14 +50,6 @@ int main(int argc, char** argv) {
     std::cout << "Descriptors computed in ";
     std::cout << (t2-t1)/CLOCKS_PER_SEC << " s." << std::endl;
 
-    // print out descriptor values
-    for (size_t i = 0; i < rdes.size(); ++i) {
-        for (int j = 0; j < 8; ++j) {
-            // std::cout << rdes.at(i).word[j] << std::endl;
-        }
-        // std::cout << "\n\n" << std::endl;
-    }
-
     // match keypoints
     std::vector<std::pair<size_t, size_t>> pairs;
     pairs = my_latch->match_keypoint_pairs(rdes, ldes);
@@ -67,6 +61,7 @@ int main(int argc, char** argv) {
     cv::hconcat(left,right,matches);
 
     // draw lines connecting matched keypoints
+    int ncols = left.cols;
     for (size_t i = 0; i < pairs.size(); ++i) {
         cv::Point2i lpoint, rpoint;
         // coordinates of point in left frame
@@ -74,7 +69,7 @@ int main(int argc, char** argv) {
         lpoint.y = lkeypoints.at(pairs.at(i).second).pt.y;
         
         // coordinates of point in right frame
-        rpoint.x = rkeypoints.at(pairs.at(i).first).pt.x + 900;
+        rpoint.x = rkeypoints.at(pairs.at(i).first).pt.x + ncols;
         rpoint.y = rkeypoints.at(pairs.at(i).first).pt.y;
 
         cv::line(matches, lpoint, rpoint, cv::Scalar(255,0,0));

@@ -25,7 +25,7 @@ class LATCH
 {
 public:
     int patch_radius, window_radius; // use radius to ensure odd number (2r+1)
-    static cv::Ptr<cv::FastFeatureDetector> detector;
+    cv::Ptr<cv::FastFeatureDetector> detector;
     static std::vector<int> triples;
 public:
     LATCH();

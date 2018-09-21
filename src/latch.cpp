@@ -1,22 +1,26 @@
 #include "latch.h"
+#include <iostream>
 
 LATCH::LATCH()
 {
     patch_radius  =  3;
     window_radius = 24;
+    detector = cv::FastFeatureDetector::create(100);
 }
 
 LATCH::LATCH(int _patch_radius, int _window_radius)
 {
     patch_radius  = _patch_radius;
     window_radius = _window_radius;
+    detector = cv::FastFeatureDetector::create(100);
 }
 
 // static stuff
 // temporary threshold set to limit keypoints
-cv::Ptr<cv::FastFeatureDetector> LATCH::detector
+// cv::Ptr<cv::FastFeatureDetector> LATCH::detector
     // = cv::FastFeatureDetector::create(100);
-    = cv::FastFeatureDetector::create(45);
+    // = cv::FastFeatureDetector::create(45);
+    // = cv::FastFeatureDetector::create(100);
 
 std::vector<cv::KeyPoint>
 LATCH::detect(const cv::Mat & im) const
@@ -25,12 +29,13 @@ LATCH::detect(const cv::Mat & im) const
     int ncols = im.cols;
     // total radius of detection
     int r = patch_radius + window_radius;
-
+    
     // slice image so that keypoints are within LATCH bounds
     cv::Mat im_interior = im(cv::Range(r, nrows-r-1), cv::Range(r, ncols-r-1));
 
     std::vector<cv::KeyPoint> keypoints;
-    LATCH::detector->detect(im_interior, keypoints, cv::Mat());
+    // LATCH::detector->detect(im_interior, keypoints, cv::Mat());
+    detector->detect(im_interior, keypoints, cv::Mat());
 
     // add back the rows and cols taken from the slicing
     for (unsigned int i = 0; i < keypoints.size(); ++i) {
@@ -46,11 +51,10 @@ LATCH::describe(const cv::Mat & im,
     const std::vector<cv::KeyPoint> & keypoints) const
 {
     int row, col;
-    // int row1, row2, col1, col2;  // patch boundaries
-    uint64_t des_tmp;            // temp variable for chunk descriptor
-    Descriptor512 des;           // single full descriptor
+    uint64_t des_tmp;     // temp variable for chunk descriptor
+    Descriptor512 des;    // single full descriptor
     std::vector<Descriptor512> descriptors;
-    uint64_t compare_bit;        // necessary to bitshift bool to >32 bits
+    uint64_t compare_bit; // necessary to bitshift bool to >32 bits
 
     // loop over KeyPoints and build sum
     for (unsigned int i = 0; i < keypoints.size(); ++i) {
@@ -153,8 +157,6 @@ std::vector<size_t> LATCH::match_keypoints_one_way(
 std::vector< std::pair<size_t, size_t> > LATCH::match_keypoint_pairs(
     const std::vector<Descriptor512> & des1,
     const std::vector<Descriptor512> & des2) const
-    // const std::vector<size_t> & matches1,
-    // const std::vector<size_t> & matches2)
 {
     std::vector<size_t> matches1 = match_keypoints_one_way(des1, des2);
     std::vector<size_t> matches2 = match_keypoints_one_way(des2, des1);
