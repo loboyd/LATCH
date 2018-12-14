@@ -5,14 +5,14 @@ LATCH::LATCH()
 {
     patch_radius  =  3;
     window_radius = 24;
-    detector = cv::FastFeatureDetector::create(100);
+    detector = cv::FastFeatureDetector::create();
 }
 
 LATCH::LATCH(int _patch_radius, int _window_radius)
 {
     patch_radius  = _patch_radius;
     window_radius = _window_radius;
-    detector = cv::FastFeatureDetector::create(100);
+    detector = cv::FastFeatureDetector::create();
 }
 
 std::vector<cv::KeyPoint>

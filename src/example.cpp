@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
     } else {
         // convert to grayscale
         cv::cvtColor(right, rgray, cv::COLOR_BGR2GRAY);
-        cv::cvtColor(left,  lgray,  cv::COLOR_BGR2GRAY);
+        cv::cvtColor(left,  lgray, cv::COLOR_BGR2GRAY);
     }
 
     // create LATCH

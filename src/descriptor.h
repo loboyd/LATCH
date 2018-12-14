@@ -3,12 +3,14 @@
 
 #include <cstdint>
 
-/*This class provides a simple way to store 512-bit values, by storing
-  separately 8 64-bit values in an array. The popcount64 implementation is from
-  the Hamming Weight Wikipedia page:
-  https://en.wikipedia.org/wiki/Hamming_weight/
-  
-  2018.08.30  --  L. Boyd*/
+/**
+ * This class provides a simple way to store 512-bit values, by storing
+ * separately 8 64-bit values in an array. The popcount64 implementation is from
+ * the Hamming Weight Wikipedia page:
+ * https://en.wikipedia.org/wiki/Hamming_weight/
+ * 
+ * 2018.08.30  --  L. Boyd
+ */
 
 template <int kBitSize>
 class Descriptor
@@ -25,7 +27,9 @@ public:
     static const uint64_t h01 = 0x0101010101010101;
 
 public:
-    /*Count population of ones in uint64_t from Wikipedia*/
+    /**
+     * Count population of ones in uint64_t from Wikipedia
+     */
     uint64_t popcount64(uint64_t x)
     {
         x -= (x >> 1) & m1;
